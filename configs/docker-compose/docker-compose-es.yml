@@ -1,0 +1,79 @@
+version: '2.2'
+services:
+  es01:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-cluster-data-dev
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-elasticsearch/es-data-1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  es02:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-cluster-data-dev
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-elasticsearch/es-data-2:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+  es03:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-cluster-data-dev
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-elasticsearch/es-data-3:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+  kibana-data:
+    image: repo.sabacell.net:5000/kibana:7.9.3        
+    ports:
+      - "5601:5601"
+    environment:
+      - SERVER_NAME=kibana-data
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10" 
+    networks:
+      - elastic    
+
+networks:
+  elastic:
+    driver: bridge
+

@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+    nginx:
+        image: repo.sabacell.net:5000/paroo.nginx:production
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host                
+        volumes:
+            - /config/nginx/conf.d:/etc/nginx/conf.d
+            - /config/nginx/mime.types:/etc/nginx/mime.types:ro
+            - /config/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+            - /config/nginx/log:/var/log/nginx/           
+            - /etc/localtime:/etc/localtime:ro               
+        deploy:
+            replicas: 1        
+            restart_policy:
+                condition: any
+                delay: 5s
+                max_attempts: 5  
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"                
+        networks:
+            - paroo
+            - monitor
+            - phoenix
+networks:
+    paroo:
+        external: true   
+    phoenix:
+        external: true  
+    monitor:
+        external: true          

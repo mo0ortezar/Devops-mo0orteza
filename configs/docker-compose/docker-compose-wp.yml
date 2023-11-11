@@ -1,0 +1,86 @@
+version: "3.6"
+services:
+    nginx:
+        image: repo.sabacell.net:5000/nginx:latest
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host
+        volumes:
+            - /WP/Nginx:/etc/nginx/conf.d
+            - /WP/Logs:/var/log/nginx
+            - /WP/www:/var/www
+            - /WP/fastcgi.conf:/etc/nginx/fastcgi.conf
+        restart: always
+        networks:
+            - wp
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"    
+    mysql:
+        image: repo.sabacell.net:5000/mariadb
+        command: 'mysqld --innodb-flush-method=fsync'
+        ports:
+            - '3306:3306'
+        volumes:
+            - /WP/DB:/var/lib/mysql
+        environment:
+            - MYSQL_DATABASE=benotedb
+            - MYSQL_TABLE_PREFIX=bn_
+            - MYSQL_USER=morteza
+            - MYSQL_PASSWORD=morteza
+            - MYSQL_ROOT_PASSWORD=morteza
+        restart: always
+        networks:
+            - wp
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"   
+    phpmyadmin:
+        image: repo.sabacell.net:5000/phpmyadmin:latest
+        container_name: phpmyadmin
+        environment:
+            - PMA_HOST=mysql
+        restart: always
+        ports:
+            - 8080:80
+        volumes:
+            - /WP/PHPMyadmin:/sessions
+            - /WP/PHPMyadmin/uploads.ini:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
+        networks:
+            - wp
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"                      
+    benote:
+        image: repo.sabacell.net:5000/wordpress:5.7.0-php7.3-fpm
+        #image: repo.sabacell.net:5000/wordpress:5.3.1-php7.3-fpm
+        volumes:
+            - /WP/www:/var/www
+        environment:
+            - WORDPRESS_DB_NAME=benotedb
+            - WORDPRESS_TABLE_PREFIX=bn_
+            - WORDPRESS_DB_HOST=mysql
+            - WORDPRESS_DB_USER=morteza
+            - WORDPRESS_DB_PASSWORD=morteza
+        links:
+            - mysql
+        restart: always
+        networks:
+            - wp
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"   
+             
+networks:
+    wp:
+        external: true

@@ -1,0 +1,85 @@
+version: "3.6"
+services:
+    redis1:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7000:6379"
+        volumes:
+           - /cluster-test/7000/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+    redis2:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7001:6379"
+        volumes:
+           - /cluster-test/7001/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+    redis3:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7002:6379"
+        volumes:
+           - /cluster-test/7002/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+    redis4:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7003:6379"
+        volumes:
+           - /cluster-test/7003/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+    redis5:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7004:6379"
+        volumes:
+           - /cluster-test/7004/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+    redis6:
+        image: repo.sabacell.net:5000/redis:alpine
+        command: redis-server --appendonly yes 
+        ports:
+            - "7005:6379"
+        volumes:
+           - /cluster-test/7005/redis.conf:/usr/local/etc/redis/redis.conf
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"
+        networks:
+            - redis 
+networks:
+  redis:
+    driver: bridge                  
+
+

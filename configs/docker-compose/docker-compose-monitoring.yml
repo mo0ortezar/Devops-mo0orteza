@@ -1,0 +1,28 @@
+version: "3.6"
+services:
+    grafana1:
+        image: repo.sabacell.net:5000/grafana:7.4.0-image-rendering-druid
+        hostname: grafana
+        ports:
+           - "3000:3000"
+            
+        #volumes:
+            #- /data/monitoring/grafana/phoenix/lib/:/var/lib/grafana
+            #- /config/monitoring/grafana/conf/phoenix/defaults.ini:/usr/share/grafana/conf/defaults.ini
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: any
+                delay: 5s
+                max_attempts: 5                    
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"                  
+       # networks:
+       #     phoenix:
+       #         aliases:
+       #             - monitoring.phoenixad.io
+networks:
+    phoenix:
+        external: true   

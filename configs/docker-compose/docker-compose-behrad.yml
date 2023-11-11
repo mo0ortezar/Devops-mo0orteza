@@ -1,0 +1,113 @@
+version: '2.2'
+services:
+  estest01:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: estest01
+    environment:
+      - node.name=estest01
+      #- "discovery.type=single-node"
+      - cluster.name=es-test-cluster
+      - discovery.seed_hosts=estest02,estest03
+      - cluster.initial_master_nodes=estest01,estest02,estest03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=P@ssw0rd
+      #- xpack.security.authc.realms.ldap.enabled
+    #restart: always
+    #mem_limit: 3GB
+    #cpus: 2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-test/es-test-1:/usr/share/elasticsearch/data
+      - /config/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - /config/elastic/role_mapping.yml:/usr/share/elasticsearch/config/role_mapping.yml
+      #- /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  estest02:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: estest02
+    environment:
+      - node.name=estest02
+      - cluster.name=es-test-cluster
+      - discovery.seed_hosts=estest01,estest03
+      - cluster.initial_master_nodes=estest01,estest02,estest03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=P@ssw0rd
+    #restart: always
+    #mem_limit: 3GB
+    #cpus: 2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-test/es-test-2:/usr/share/elasticsearch/data
+      - /config/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - /config/elastic/role_mapping.yml:/usr/share/elasticsearch/config/role_mapping.yml
+      #- /etc/localtime:/etc/localtime:ro
+    networks:
+      - elastic
+  estest03:
+    image: repo.sabacell.net:5000/elasticsearch:7.9.3
+    container_name: estest03
+    environment:
+      - node.name=estest03
+      - cluster.name=es-test-cluster
+      - discovery.seed_hosts=estest01,estest02
+      - cluster.initial_master_nodes=estest01,estest02,estest03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=P@ssw0rd
+    #restart: always
+    #mem_limit: 3GB
+    #cpus: 2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /storages-test/es-test-3:/usr/share/elasticsearch/data
+      - /config/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - /config/elastic/role_mapping.yml:/usr/share/elasticsearch/config/role_mapping.yml
+      #- /etc/localtime:/etc/localtime:ro
+    networks:
+      - elastic
+  kibana-test:
+    image: repo.sabacell.net:5000/kibana:7.9.3
+    ports:
+      - "5601:5601"
+    restart: always
+    #mem_limit: 2GB
+    #cpus: 2
+    environment:
+      - SERVER_NAME=kibana-test
+      - ELASTICSEARCH_HOSTS=http://estest01:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=P@ssw0rd
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+    networks:
+      - elastic
+
+networks:
+  elastic:
+    driver: bridge
+

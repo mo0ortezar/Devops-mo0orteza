@@ -1,0 +1,41 @@
+version: "3.6"
+services:
+    trax:
+        image: repo.sabacell.net:5000/phoenix.trax:dev
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host
+        environment:
+            - REDIS_SERVER=10.0.0.67
+            - REDIS_PORT=6379
+            - REDIS_AUTH_KEY=u5CVSyY6o7v3JxIz
+            - KAFKA_SERVER=10.0.0.67
+            - KAFKA_PORT=9092
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /data/infra/trax/IP2LOCATION.BIN:/etc/nginx/conf.d/IP2LOCATION.BIN:ro
+            - /config/infra/trax/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+            - /config/infra/trax/mime.types:/etc/nginx/mime.types           
+            - /config/infra/trax/conf.d/ssl:/etc/nginx/conf.d/ssl
+            - /config/infra/trax/conf.d/configs:/etc/nginx/conf.d/configs
+            - /storages-nike/cdn:/data
+        logging:
+            driver: "fluentd"
+            options:
+                fluentd-address: 127.0.0.1:24221
+                tag: nginx-trax
+                fluentd-async-connect: "true"
+        networks:
+            - net
+networks:
+    net:
+        external: true
+        
+        
+        

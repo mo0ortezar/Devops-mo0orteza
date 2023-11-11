@@ -1,0 +1,47 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "nginx.*.rule"
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+    - targets: ['localhost:9090']
+    - targets: ['93.115.151.136:9145']
+  ######################### OS / Infrastructure Exporters ########################
+  # Node Exporter
+  - job_name: Searchad_Prod_os
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['93.115.151.136:9100']    
+  ######################### OS / Infrastructure Exporters ########################
+  # Node Exporter
+  - job_name: Searchad_Infra_Prod_os
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['93.115.151.136:9101']   
+  ######################### Infra Exporters ########################
+  # Nginx  
+  - job_name: Searchad_Prod_infra_nginx
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['93.115.151.136:1311'] 
+  ################### cAdvisor Exporters ##########################
+  #cAdvisor
+  - job_name: Searchad_Prod_Docker 
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['93.115.151.136:1310']

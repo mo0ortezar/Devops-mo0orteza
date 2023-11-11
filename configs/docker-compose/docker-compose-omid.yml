@@ -1,0 +1,28 @@
+version: "3.6"
+services:
+    nginx:
+        image: repo.sabacell.net:5000/nginx:latest
+        ports:
+            - target: 80
+              published: 80
+              protocol: tcp
+              mode: host
+            - target: 443
+              published: 443
+              protocol: tcp
+              mode: host
+        volumes:
+            - /omid/Nginx:/etc/nginx/conf.d
+            - /omid/Logs:/var/log/nginx
+            - /omid/www:/var/www
+            - /omid/fastcgi.conf:/etc/nginx/fastcgi.conf
+        restart: always
+        networks:
+            - omid
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "50m"                         
+networks:
+    omid:
+        external: true
